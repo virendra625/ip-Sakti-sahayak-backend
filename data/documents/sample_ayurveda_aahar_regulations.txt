@@ -1,0 +1,22 @@
+================================================================================
+DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+================================================================================
+Document Title: Food Safety and Standards (Ayurveda Aahar) Regulations, 2022
+Authority: Food Safety and Standards Authority of India (FSSAI) & Ministry of AYUSH
+Jurisdiction: India
+Country: India
+Document Type: regulation
+Topic: Ayurveda_Aahar
+Version: 2022_gazette
+Source URL: https://fssai.gov.in
+
+Regulation 3: Definition and Scope of Ayurveda Aahar
+"Ayurveda Aahar" means food prepared in accordance with the recipes or books/processes specified in the First Schedule of the Drugs and Cosmetics Act, 1940 and other recognized authoritative Ayurvedic publications. It includes foods containing ingredients specified in Schedule A of these regulations.
+
+Clause 3(2): Exclusion from Ayurveda Aahar
+Ayurveda Aahar shall NOT include Ayurvedic medicines, proprietary Ayurvedic drugs, phytopharmaceuticals, or products containing synthetic vitamins, added synthetic minerals, synthetic chemicals, or purified active pharmaceutical isolates.
+
+Regulation 5: Labelling and Packaging Standards
+1. Every package of Ayurveda Aahar shall carry the designated official "Ayurveda Aahar" logo.
+2. The label must explicitly state: "For health and dietary consumption — NOT for medicinal use or treatment of disease."
+3. The advisory must indicate the target consumer category, recommended daily dosage, and contra-indications where applicable.

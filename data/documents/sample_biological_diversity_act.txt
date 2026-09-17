@@ -1,0 +1,21 @@
+================================================================================
+DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+================================================================================
+Document Title: Biological Diversity Act, 2002 & Guidelines
+Authority: National Biodiversity Authority (NBA) / Ministry of Environment, Forest and Climate Change
+Jurisdiction: India
+Country: India
+Document Type: statute
+Topic: Biological_Resources
+Version: current
+Source URL: https://nbaindia.org
+
+Section 3: Access to Biological Resources
+No person who is not a citizen of India, or a body corporate, association or organization not incorporated or registered in India, or having non-Indian participation in its share capital or management, shall obtain any biological resource occurring in India or knowledge associated thereto for research, commercial utilization, or bio-survey without previous approval of the National Biodiversity Authority.
+
+Section 6: Application for Intellectual Property Rights (IPR)
+1. No person shall apply for any intellectual property right, by whatever name called, in or outside India for any invention based on any research or information on a biological resource obtained from India without obtaining previous approval of the National Biodiversity Authority prior to making such application.
+Provided that if a person applies for a patent, permission may be obtained after acceptance of the patent application but before the formal grant of the patent by the patent office.
+
+Section 24: State Biodiversity Board (SBB) Intimation for Indian Citizens
+Citizens of India and Indian legal entities intending to commercially utilize biological resources for manufacturing Ayurvedic drugs must give prior intimation to the concerned State Biodiversity Board (SBB) and comply with the Access and Benefit Sharing (ABS) regulations.

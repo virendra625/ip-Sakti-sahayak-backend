@@ -1,0 +1,24 @@
+================================================================================
+DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+================================================================================
+Document Title: Drugs and Cosmetics Act, 1940 - Chapter IV-A
+Authority: Ministry of Health and Family Welfare / Ministry of AYUSH
+Jurisdiction: India
+Country: India
+Document Type: statute
+Topic: Classical_Medicine
+Version: current
+Source URL: https://ayush.gov.in
+
+Chapter IV-A: Provisions Relating to Ayurvedic, Siddha and Unani Drugs
+
+Section 3(a): Ayurvedic, Siddha or Unani (ASU) Drug Definition
+"Ayurvedic, Siddha or Unani drug" includes all medicines intended for internal or external use for or in the diagnosis, treatment, mitigation or prevention of disease or disorder in human beings or animals, and manufactured exclusively in accordance with the formulae described in the authoritative books of Ayurvedic, Siddha and Unani systems of medicine specified in the First Schedule.
+
+Section 33EEB: Patent or Proprietary Medicine in ASU Systems
+In relation to Ayurvedic, Siddha or Unani systems of medicine, "Patent or Proprietary medicine" means a formulation containing only ingredients mentioned in the formulae described in the authoritative books of Ayurvedic, Siddha or Unani systems of medicine specified in the First Schedule, but does not include a medicine which is administered by parenteral route and also a formulation which contains any substance which is not included in the said books.
+
+Rule 158-B: Guidelines for Issue of License for ASU Drugs
+For grant of license to manufacture ASU drugs:
+1. Classical ASU medicines require citation and reference to the First Schedule authoritative texts (e.g. Charaka Samhita, Sushruta Samhita, Sharangadhara Samhita). Safety and efficacy are traditionally presumed if prepared strictly according to classical texts.
+2. Patent or Proprietary ASU medicines with new excipients, altered proportions, or modified dosage forms require safety data or published literature showing established safety and effectiveness.
