@@ -28,7 +28,7 @@ class EvidenceService:
                 ConfidenceDetail(
                     level="INSUFFICIENT",
                     score=0.0,
-                    reason="No authoritative documents or regulatory sections were retrieved matching the query."
+                    reason="I could not find sufficient authoritative evidence in the current knowledge base matching the query."
                 ),
                 False,
                 None,
@@ -58,7 +58,9 @@ class EvidenceService:
         has_classical_source = any("classical" in s.topic.lower() or "first schedule" in s.chunk_text.lower() for s in retrieved_sources)
 
         # If evaluating a classical formulation for a patent, highlight the legal friction
-        if has_patent_source and has_classical_source:
+        # only if citations actually reference the patent or classical provisions
+        is_patent_cited = any("patent" in c.document_title.lower() or "section 3" in (c.section or "").lower() for c in valid_citations)
+        if has_patent_source and has_classical_source and is_patent_cited:
             conflict_detected = True
             conflict_warning = (
                 "Potential legal nuance detected: Classical Ayurvedic formulations are traditionally protected "

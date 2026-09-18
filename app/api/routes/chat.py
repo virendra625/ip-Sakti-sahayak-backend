@@ -45,6 +45,9 @@ async def chat_endpoint(
     )
     request.conversation_id = conv.id
 
+    # Retrieve recent conversation history prior to current message
+    history_messages = conv_repo.get_conversation_history(conversation_id=conv.id, limit=6)
+
     # Record User Message
     user_msg = conv_repo.add_message(
         conversation_id=conv.id,
@@ -54,7 +57,9 @@ async def chat_endpoint(
 
     # 3. Execute Grounded RAG Pipeline
     rag_service = RAGService(db)
-    response: ChatResponse = await rag_service.answer_question(request)
+    response: ChatResponse = await rag_service.answer_question(
+        request, conversation_history=history_messages
+    )
 
     # 4. Record Assistant Message & Attached Citations in DB
     asst_msg = conv_repo.add_message(

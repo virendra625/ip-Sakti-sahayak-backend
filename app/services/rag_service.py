@@ -9,6 +9,8 @@ from app.rag.prompt_templates import (
     SYSTEM_PROMPT_EN,
     SYSTEM_PROMPT_HI,
     USER_PROMPT_TEMPLATE,
+    get_system_prompt,
+    build_user_prompt,
 )
 from app.schemas.chat import ChatRequest, ChatResponse, CitationDetail
 from app.schemas.classification import ProductClassificationRequest, ProductClassificationResponse
@@ -31,11 +33,18 @@ class RAGService:
         self.retriever = get_retriever()
         self.llm_provider = get_llm_provider()
 
-    async def answer_question(self, request: ChatRequest) -> ChatResponse:
+    async def answer_question(
+        self,
+        request: ChatRequest,
+        conversation_history: Optional[List[Any]] = None,
+    ) -> ChatResponse:
         start_time = time.time()
 
         # 1. Language Detection & Query Translation Preprocessing
-        detected_lang = request.language or detect_language(request.message)
+        if request.language and request.language not in ("en", "auto"):
+            detected_lang = request.language
+        else:
+            detected_lang = detect_language(request.message)
         processed_query = TranslationService.prepare_retrieval_query(
             request.message, detected_lang
         )
@@ -82,17 +91,19 @@ class RAGService:
             except Exception as exc:
                 logger.warning(f"Could not parse product_context for classification: {exc}")
 
-        # 4. Hybrid Vector Retrieval
+        # 4. Hybrid Vector Retrieval using Configured Similarity Threshold
+        from app.core.config import settings
         retrieval_start = time.time()
         retrieved_sources: List[SearchResultChunk] = await self.retriever.retrieve(
             query=processed_query,
             jurisdiction=canonical_jurisdiction,
             topic=filter_topic,
             limit=5,
+            score_threshold=settings.SIMILARITY_THRESHOLD,
         )
         retrieval_duration = round((time.time() - retrieval_start) * 1000, 2)
         logger.info(
-            f"RAG Retrieval completed in {retrieval_duration}ms - Retrieved {len(retrieved_sources)} chunks."
+            f"RAG Retrieval completed in {retrieval_duration}ms - Retrieved {len(retrieved_sources)} chunks (threshold={settings.SIMILARITY_THRESHOLD})."
         )
 
         # 5. Format Retrieved Context & Assemble Prompt
@@ -102,11 +113,15 @@ class RAGService:
                 sec = f" | Section: {src.section_number}" if src.section_number else ""
                 pg = f" | Page: {src.page_number}" if src.page_number else ""
                 sources_block += (
-                    f"[{idx}] {src.document_title} (Authority: {src.authority}{sec}{pg})\n"
+                    f"[Source {idx}] {src.document_title} (Authority: {src.authority}{sec}{pg})\n"
                     f"Content: {src.chunk_text}\n\n"
                 )
         else:
-            sources_block = "NO RELEVANT SOURCES RETRIEVED."
+            sources_block = (
+                "कोई प्रासंगिक स्रोत उपलब्ध नहीं है।"
+                if detected_lang == "hi"
+                else "NO RELEVANT SOURCES RETRIEVED."
+            )
 
         product_block = "None"
         if classification_result:
@@ -116,16 +131,28 @@ class RAGService:
                 f"IPR Guidance: {', '.join(classification_result.ipr_implications)}"
             )
 
-        system_prompt = (
-            SYSTEM_PROMPT_HI.format(jurisdiction=canonical_jurisdiction)
-            if detected_lang == "hi"
-            else SYSTEM_PROMPT_EN.format(jurisdiction=canonical_jurisdiction)
+        # Format conversation context
+        history_block = "None"
+        if conversation_history:
+            formatted_turns = []
+            for m in conversation_history:
+                role_label = "User" if getattr(m, "role", "") == "user" else "Assistant"
+                content_snippet = getattr(m, "content", "")[:250]
+                formatted_turns.append(f"{role_label}: {content_snippet}")
+            if formatted_turns:
+                history_block = "\n".join(formatted_turns)
+
+        system_prompt = get_system_prompt(
+            language=detected_lang,
+            jurisdiction=canonical_jurisdiction,
         )
 
-        user_prompt = USER_PROMPT_TEMPLATE.format(
-            retrieved_sources_block=sources_block,
-            product_context_block=product_block,
+        user_prompt = build_user_prompt(
             user_query=request.message,
+            sources_block=sources_block,
+            product_context_block=product_block,
+            conversation_context_block=history_block,
+            language=detected_lang,
         )
 
         # 6. Generate Response via LLM
@@ -139,30 +166,50 @@ class RAGService:
         llm_duration = round((time.time() - llm_start) * 1000, 2)
         logger.info(f"LLM generation completed in {llm_duration}ms.")
 
-        # 7. Extract and Map Citations (Section 13)
+        # 7. Extract and Map Citations (Only sources actually cited)
         citations: List[CitationDetail] = CitationService.extract_and_build_citations(
             answer_text=raw_answer,
             retrieved_sources=retrieved_sources,
         )
 
-        # 8. Evidence Validation & Conflict Detection (Section 14 & 15)
+        # Filter to show ONLY supporting sources (User question -> retrieve chunks -> LLM answers -> show only supporting sources)
+        cited_indices = {c.citation_id for c in citations}
+        supporting_sources: List[SearchResultChunk] = [
+            retrieved_sources[idx - 1]
+            for idx in sorted(list(cited_indices))
+            if 0 <= idx - 1 < len(retrieved_sources)
+        ]
+
+        # 8. Evidence Validation & Conflict Detection
         confidence_detail, conflict_detected, conflict_warning = EvidenceService.validate_and_score_evidence(
             retrieved_sources=retrieved_sources,
             citations=citations,
             selected_jurisdiction=canonical_jurisdiction,
         )
 
-        # 9. Handle Insufficient Evidence Safeguard (Section 15)
-        if confidence_detail.level == "INSUFFICIENT" or not retrieved_sources:
+        # 9. Handle Insufficient Evidence Safeguard (Rule 3)
+        # For substantive legal/regulatory questions with insufficient evidence, enforce standard admission
+        greeting_words = ["hello", "hi", "hey", "नमस्ते", "namaste", "pranam", "help", "who are you", "who you are"]
+        is_greeting = any(g in request.message.lower() for g in greeting_words)
+        is_intake = any(k in request.message.lower() for k in ["what information", "what do you need", "what details", "kya information", "kya details"])
+
+        if (confidence_detail.level == "INSUFFICIENT" or not retrieved_sources) and not (is_greeting or is_intake):
             if detected_lang == "hi":
                 raw_answer = (
-                    "वर्तमान ज्ञानकोश में इस विषय पर आधिकारिक साक्ष्य उपलब्ध नहीं हैं। "
-                    "मैं बिना आधिकारिक स्रोत के अनुमानित उत्तर नहीं दे सकता।"
+                    "इस प्रश्न के लिए कोई पर्याप्त प्रासंगिक स्रोत नहीं मिला। "
+                    "मेरे पास इसका सटीक उत्तर देने के लिए पर्याप्त विश्वसनीय स्रोत जानकारी नहीं है। "
+                    "वर्तमान ज्ञानकोश में इस विषय पर आधिकारिक साक्ष्य उपलब्ध नहीं हैं।"
+                )
+            elif detected_lang == "hinglish":
+                raw_answer = (
+                    "Is sawal ke liye koi sufficiently relevant source nahi mila. "
+                    "Mere paas iska accurate answer dene ke liye reliable source information nahi hai."
                 )
             else:
                 raw_answer = (
-                    "I could not find sufficient authoritative evidence in the current knowledge base to answer this reliably. "
-                    "The system does not fabricate legal conclusions when authoritative sources are missing."
+                    "No sufficiently relevant source was found for this question. "
+                    "I don't have enough reliable source information to answer that accurately. "
+                    "I could not find sufficient authoritative evidence in the current knowledge base to answer this reliably."
                 )
 
         disclaimer = TranslationService.get_localized_disclaimer(detected_lang)
@@ -176,7 +223,7 @@ class RAGService:
             product_classification=classification_result,
             confidence=confidence_detail,
             citations=citations,
-            sources=retrieved_sources,
+            sources=supporting_sources,
             missing_information=(
                 classification_result.missing_information if classification_result else []
             ),

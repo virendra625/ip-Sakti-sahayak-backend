@@ -26,6 +26,7 @@ async def search_retrieval_endpoint(
         topic=request.topic,
         document_type=request.document_type,
         limit=request.limit,
+        score_threshold=request.score_threshold,
     )
     return SearchResponse(
         query=request.query,

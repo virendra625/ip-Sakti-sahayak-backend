@@ -24,15 +24,18 @@ class TranslationService:
         "अधिनियम": "act statute",
         "धारा": "section",
         "प्रसाधन": "cosmetic",
+        "ट्रेडमार्क": "trademark class",
+        "ब्रांड": "brand trademark",
+        "परीक्षण": "testing clinical trials safety",
+        "अनुमोदन": "approval regulatory license",
     }
 
     @classmethod
     def prepare_retrieval_query(cls, user_text: str, detected_lang: str) -> str:
-        """If user asked in Hindi, augment query with corresponding English legal terms
-
+        """If user asked in Hindi or Hinglish, augment query with corresponding English legal terms
         to maximize vector recall across authoritative English statutes.
         """
-        if detected_lang != "hi":
+        if detected_lang not in ("hi", "hinglish"):
             return user_text
 
         expanded_tokens = [user_text]
@@ -47,14 +50,10 @@ class TranslationService:
         """Returns standard legal decision-support disclaimer in requested language."""
         if language == "hi":
             return (
-                "यह उत्तर केवल सूचना और निर्णय-समर्थन (decision-support) उद्देश्यों के लिए है। "
-                "यह प्रणाली में उपलब्ध आधिकारिक स्रोतों पर आधारित है और इसे विधिक, चिकित्सा या "
-                "नियामक सलाह नहीं माना जाना चाहिए। आधिकारिक निर्णय के लिए सक्षम विधिक विशेषज्ञ या "
-                "पेटेंट अटॉर्नी से परामर्श लें।"
+                "यह केवल प्रारंभिक सूचनात्मक मार्गदर्शन एवं निर्णय-समर्थन है, कानूनी सलाह नहीं। "
+                "व्यावसायिक उपयोग से पहले कृपया संबंधित प्राधिकरण या योग्य पेशेवर से लागू आवश्यकताओं का सत्यापन करें।"
             )
         return (
-            "This response is for informational and decision-support purposes only. "
-            "It is based on the sources available in the system and should not be treated as "
-            "legal, medical, regulatory, or professional advice. Verify current official requirements "
-            "and consult an appropriately qualified professional for a binding decision."
+            "This is preliminary informational guidance, not legal advice. "
+            "Please verify the applicable requirements with the relevant authority or a qualified professional before commercial use."
         )

@@ -149,15 +149,18 @@ class QdrantRetriever:
 
         q_filter = qmodels.Filter(must=filter_conditions) if filter_conditions else None
 
-        # Execute vector search
-        # qdrant-client >= 1.7 uses client.query_points(...) or client.search(...)
+        # Execute vector search using configured similarity threshold
+        effective_threshold = (
+            score_threshold if score_threshold is not None else settings.SIMILARITY_THRESHOLD
+        )
+
         try:
             hits = self.client.search(
                 collection_name=self.collection_name,
                 query_vector=query_vector,
                 query_filter=q_filter,
                 limit=limit,
-                score_threshold=score_threshold if score_threshold else 0.0,
+                score_threshold=effective_threshold,
             )
         except AttributeError:
             # Newer qdrant-client alternative
@@ -166,11 +169,16 @@ class QdrantRetriever:
                 query=query_vector,
                 query_filter=q_filter,
                 limit=limit,
+                score_threshold=effective_threshold,
             )
             hits = res.points
 
         results: List[SearchResultChunk] = []
         for hit in hits:
+            score = round(float(hit.score), 4) if hasattr(hit, "score") and hit.score is not None else 0.0
+            if effective_threshold is not None and score < effective_threshold:
+                continue
+
             payload = hit.payload or {}
             results.append(
                 SearchResultChunk(
@@ -183,7 +191,7 @@ class QdrantRetriever:
                     page_number=payload.get("page_number"),
                     heading=payload.get("heading"),
                     chunk_text=payload.get("chunk_text", ""),
-                    relevance_score=round(float(hit.score), 4) if hasattr(hit, "score") else 0.0,
+                    relevance_score=score,
                     source_url=payload.get("source_url"),
                     version=payload.get("version", "current"),
                 )

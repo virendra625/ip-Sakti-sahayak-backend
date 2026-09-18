@@ -3,11 +3,15 @@
 import re
 
 
-def detect_language(text: str) -> str:
-    """Detects whether the input text is primarily Hindi (Devanagari) or English.
+HINGLISH_MARKERS = {
+    "kya", "hai", "hain", "kaise", "hoga", "hogi", "kar", "sakta", "sakte", "sakti",
+    "hoon", "hu", "ke", "liye", "mera", "meri", "mere", "chahiye", "kaun", "bhi",
+    "aur", "mein", "dawa", "aushadhi", "bana", "raha", "rahi", "ayurvedic", "lagta"
+}
 
-    Uses Unicode block inspection (Devanagari: \u0900-\u097F).
-    """
+
+def detect_language(text: str) -> str:
+    """Detects whether input text is Hindi (Devanagari), Hinglish, or English."""
     if not text:
         return "en"
 
@@ -16,6 +20,12 @@ def detect_language(text: str) -> str:
 
     if total_alpha > 0 and (devanagari_chars / total_alpha) > 0.3:
         return "hi"
+
+    # Check for conversational Hinglish in Latin script
+    words = {w.strip(".,?!:;\"'") for w in text.lower().split()}
+    matching_hinglish = words.intersection(HINGLISH_MARKERS)
+    if len(matching_hinglish) >= 2:
+        return "hinglish"
 
     return "en"
 

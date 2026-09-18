@@ -20,8 +20,8 @@ class CitationService:
 
         retrieved chunks, and constructs structured CitationDetail objects.
         """
-        # Find all brackets containing integers: e.g. [1], [2], [1, 2]
-        matches = re.findall(r"\[([0-9]+(?:\s*,\s*[0-9]+)*)\]", answer_text)
+        # Find all brackets containing integers: e.g. [1], [2], [1, 2], [Source 1], [source 2]
+        matches = re.findall(r"\[(?:Source\s*)?([0-9]+(?:\s*,\s*[0-9]+)*)\]", answer_text, re.IGNORECASE)
         cited_indices = set()
         for m in matches:
             for part in m.split(","):
@@ -29,9 +29,8 @@ class CitationService:
                 if part.isdigit():
                     cited_indices.add(int(part))
 
-        # If LLM didn't insert brackets but retrieved sources exist, attach top sources
-        if not cited_indices and retrieved_sources:
-            cited_indices = {1}
+        # NOTE: Do NOT fallback to {1} if cited_indices is empty.
+        # Showing Source 1 when it was not cited leads to hallucinated attribution.
 
         citations: List[CitationDetail] = []
         for idx in sorted(list(cited_indices)):

@@ -24,6 +24,7 @@ class SearchRequest(BaseModel):
     topic: Optional[str] = Field(None, examples=["Patent"])
     document_type: Optional[str] = Field(None, examples=["statute"])
     limit: int = Field(5, ge=1, le=20, examples=[5])
+    score_threshold: Optional[float] = Field(None, ge=0.0, le=1.0, description="Optional custom similarity threshold")
 
 
 class SearchResultChunk(BaseModel):

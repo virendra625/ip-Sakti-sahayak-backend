@@ -31,7 +31,7 @@ class ConfidenceDetail(BaseModel):
 class ChatRequest(BaseModel):
     """Input payload for chat turn."""
     message: str = Field(..., min_length=2, examples=["Can an Ayurvedic classical formulation be patented in India?"])
-    language: Optional[str] = Field("en", examples=["en"], description="Language code: 'en' or 'hi'")
+    language: Optional[str] = Field(None, examples=["en"], description="Language code: 'en', 'hi', or 'hinglish' (auto-detected if omitted)")
     jurisdiction: Optional[str] = Field("India", examples=["India"], description="Selected jurisdiction (e.g. India, International)")
     conversation_id: Optional[str] = Field(None, examples=["3fa85f64-5717-4562-b3fc-2c963f66afa6"])
     product_context: Optional[Dict[str, Any]] = Field(
