@@ -166,6 +166,11 @@ class RAGService:
         llm_duration = round((time.time() - llm_start) * 1000, 2)
         logger.info(f"LLM generation completed in {llm_duration}ms.")
 
+        # 6b. Sanitize and validate all URLs in answer text (Prevent hallucinated or unverified URLs)
+        from app.services.url_service import URLService
+        allowed_urls = [s.source_url for s in retrieved_sources if s.source_url]
+        raw_answer = URLService.validate_and_sanitize_answer_urls(raw_answer, allowed_urls=allowed_urls)
+
         # 7. Extract and Map Citations (Only sources actually cited)
         citations: List[CitationDetail] = CitationService.extract_and_build_citations(
             answer_text=raw_answer,

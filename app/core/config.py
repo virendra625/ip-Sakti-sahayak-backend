@@ -62,7 +62,7 @@ class Settings(BaseSettings):
 
     # RAG Retrieval Settings
     DEFAULT_RETRIEVAL_LIMIT: int = 5
-    SIMILARITY_THRESHOLD: float = 0.10
+    SIMILARITY_THRESHOLD: float = 0.35
 
     model_config = SettingsConfigDict(
         env_file=".env",

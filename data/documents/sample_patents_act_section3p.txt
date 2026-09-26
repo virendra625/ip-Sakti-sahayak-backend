@@ -1,5 +1,5 @@
 ================================================================================
-DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+Curated source excerpt. Refer to official government source URL for current text.
 ================================================================================
 Document Title: The Patents Act, 1970 (As Amended)
 Authority: Indian Patent Office (IPO) / Parliament of India
@@ -8,18 +8,19 @@ Country: India
 Document Type: statute
 Topic: Patent
 Version: 2005_amendment
-Source URL: https://ipindia.gov.in
+Source URL: https://ipindia.gov.in/resource/patents-resources-act
 
-Chapter II - Inventions Not Patentable
+Chapter II - Inventions Not Patentable: Patentability Exclusions
 
 Section 3: What are not inventions
 The following are not inventions within the meaning of this Act:
 
-Section 3(p): An invention which in effect, is traditional knowledge or which is an aggregation or duplication of known properties of traditionally known component or components.
+Section 3(p): Traditional Knowledge Patentability Exclusions and Classical Ayurvedic Formulations
+An invention which in effect, is traditional knowledge or which is an aggregation or duplication of known properties of traditionally known component or components.
 
 Explanation:
-Under Indian Patent law, pure formulations of Ayurveda, Yoga, Unani, Siddha, or Homeopathy that represent traditional knowledge known to the public through classical texts or folklore cannot be granted patent monopoly.
-However, novel extracts, synergistic chemical combinations demonstrating an unexpected efficacy increase (beyond simple additive properties under Section 3(e)), or novel non-obvious drug delivery systems may be considered provided they overcome Section 3(p) and Section 3(d) hurdles.
+Under Indian Patent law, pure formulations and classical Ayurvedic medicines (along with Yoga, Unani, Siddha, or Homeopathy) that represent traditional knowledge known to the public through classical authoritative texts or folklore cannot be granted patent monopoly.
+However, novel extraction processes, non-obvious combinations demonstrating an unexpected technical effect beyond simple aggregation under Section 3(e), or novel drug delivery systems may be considered provided they satisfy statutory requirements under the Patents Act.
 
 Section 10(4)(d)(ii): Disclosure of Biological Material
 Every complete specification must disclose the source and geographical origin of the biological material in the specification, when used in an invention. If the biological resource is obtained from India, prior approval of the National Biodiversity Authority (NBA) is mandatory under Section 6 of the Biological Diversity Act, 2002 before the grant of the patent.

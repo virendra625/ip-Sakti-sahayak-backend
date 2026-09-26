@@ -110,7 +110,7 @@ class ClassificationService:
             relevant_topics.extend(["Cosmetic", "Manufacturing", "Safety"])
             ipr_implications.extend([
                 "Trademarks and industrial designs for packaging are key IPR assets.",
-                "Novel synergistic cosmetic formulations may seek patent protection if they demonstrate unexpected properties.",
+                "Novel cosmetic formulations may seek patent protection if they demonstrate an inventive step and unexpected technical effect.",
             ])
 
         # C. Phytopharmaceutical (CDSCO New Drug provisions)
@@ -130,9 +130,9 @@ class ClassificationService:
             )
             relevant_topics.extend(["New_Drug", "Phytopharmaceutical", "Safety", "Patent"])
             ipr_implications.extend([
-                "High patentability potential for novel extraction processes and synergistic standardized fractions.",
-                "Must overcome Section 3(d) and Section 3(p) objections by demonstrating enhanced therapeutic efficacy.",
-                "Mandatory National Biodiversity Authority (NBA) approval under Section 6 of Biological Diversity Act.",
+                "High patentability potential for novel extraction processes and standardized bioactive fractions.",
+                "Must overcome Section 3(d) and Section 3(p) objections by demonstrating an inventive step beyond known plant properties.",
+                "May require prior approval from the National Biodiversity Authority (NBA) under Section 6 of the Biological Diversity Act, 2002 if biological resources obtained from India are used.",
             ])
 
         # D. Classical ASU Medicine
@@ -154,9 +154,9 @@ class ClassificationService:
             )
             relevant_topics.extend(["Classical_Medicine", "Licensing", "Traditional_Knowledge"])
             ipr_implications.extend([
-                "Strictly NON-PATENTABLE in India under Section 3(p) of the Patents Act, 1970 (Traditional Knowledge).",
+                "Generally excluded from patentability under Section 3(p) of the Patents Act, 1970 as traditional knowledge, unless an inventive step or novel extraction process beyond classical scriptures is demonstrated.",
                 "Monopoly rights cannot be claimed over classical ASU names; protection relies on Trademark for brand identity.",
-                "Export or commercial use of biological herbs requires State Biodiversity Board (SBB) intimation.",
+                "Export or commercial use of biological herbs may require State Biodiversity Board (SBB) intimation.",
             ])
 
         # E. Patent or Proprietary ASU Medicine
@@ -179,9 +179,9 @@ class ClassificationService:
             relevant_topics.extend(["Proprietary_Medicine", "Patent", "Licensing", "Safety"])
             ipr_implications.extend([
                 "Product itself is not automatically patentable if it merely aggregates known properties (Section 3(e) & 3(p)).",
-                "A patent is possible ONLY if a novel, non-obvious synergistic therapeutic effect or novel delivery system is proven.",
+                "A patent requires an inventive step beyond classical scriptures, such as a novel extraction process, non-obvious combination overcoming Section 3(e), or novel delivery system.",
                 "Trademark registration for brand name is strongly advised.",
-                "Prior NBA approval required before filing a patent if Indian biological materials are used.",
+                "May require approval from the National Biodiversity Authority (NBA) under Section 6 before patent grant if Indian biological resources are used.",
             ])
 
         # F. Other / New Drug
@@ -193,14 +193,14 @@ class ClassificationService:
                 "against ASU and modern pharmaceutical regulatory classifications."
             )
             relevant_topics.extend(["New_Drug", "Licensing"])
-            ipr_implications.append("Seek comprehensive legal opinion to determine whether classified as an ASU or New Drug.")
+            ipr_implications.append("Seek comprehensive regulatory assessment to determine whether classified as an ASU or New Drug.")
 
         # Biological Resources check
         if bio_resources or "root" in desc or "herb" in desc or "extract" in desc:
             relevant_topics.append("Biological_Resources")
-            if "Mandatory National Biodiversity Authority" not in " ".join(ipr_implications):
+            if "National Biodiversity Authority" not in " ".join(ipr_implications):
                 ipr_implications.append(
-                    "Biological Diversity Act, 2002: Commercial utilization requires intimation to the State Biodiversity Board (SBB)."
+                    "Biological Diversity Act, 2002: Commercial utilization may require intimation to the State Biodiversity Board (SBB)."
                 )
 
         return ProductClassificationResponse(
@@ -217,8 +217,9 @@ class ClassificationService:
     def _get_disclaimer() -> str:
         return (
             "Likely classification based on provided information. "
-            "This response is for informational and decision-support purposes only. "
-            "It is based on the statutory framework of the Drugs and Cosmetics Act, 1940 and related rules, "
-            "and should not be treated as an official regulatory determination. "
-            "Please consult the State Licensing Authority (AYUSH) or a qualified regulatory consultant."
+            "This response is for informational and decision-support purposes only and does not constitute "
+            "a formal regulatory determination or legal advice. "
+            "Final legal and regulatory determination depends on the specific formulation, actual claims, "
+            "and evaluation by the State Licensing Authority (AYUSH) or qualified regulatory counsel."
         )
+

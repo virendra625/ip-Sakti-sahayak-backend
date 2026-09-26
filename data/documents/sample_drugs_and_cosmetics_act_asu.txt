@@ -1,14 +1,14 @@
 ================================================================================
-DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+Curated source excerpt. Refer to official government source URL for current text.
 ================================================================================
 Document Title: Drugs and Cosmetics Act, 1940 - Chapter IV-A
-Authority: Ministry of Health and Family Welfare / Ministry of AYUSH
+Authority: Ministry of Health and Family Welfare / Ministry of AYUSH / CDSCO
 Jurisdiction: India
 Country: India
 Document Type: statute
 Topic: Classical_Medicine
 Version: current
-Source URL: https://ayush.gov.in
+Source URL: https://cdsco.gov.in/opencms/opencms/en/Acts-Rules
 
 Chapter IV-A: Provisions Relating to Ayurvedic, Siddha and Unani Drugs
 

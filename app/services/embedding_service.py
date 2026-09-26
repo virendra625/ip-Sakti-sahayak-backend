@@ -43,18 +43,66 @@ class MockDeterministicEmbeddingProvider(BaseEmbeddingProvider):
     def get_embedding_dimension(self) -> int:
         return self.dimension
 
+    STOPWORDS = {
+        "a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "as", "at",
+        "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can", "did", "do",
+        "does", "doing", "down", "during", "each", "few", "for", "from", "further", "had", "has", "have", "having",
+        "he", "her", "here", "hers", "herself", "him", "himself", "his", "how", "i", "if", "in", "into", "is", "it",
+        "its", "itself", "just", "me", "more", "most", "my", "myself", "no", "nor", "not", "now", "of", "off", "on",
+        "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over", "own", "same", "she", "should",
+        "so", "some", "such", "than", "that", "the", "their", "theirs", "them", "themselves", "then", "there",
+        "these", "they", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "we",
+        "were", "what", "when", "where", "which", "while", "who", "whom", "why", "with", "would", "you", "your",
+        "hai", "hain", "ke", "ki", "ka", "ko", "se", "me", "mein", "par", "kya", "aur", "ye", "yeh", "woh"
+    }
+
+    @staticmethod
+    def _stem_token(word: str) -> str:
+        """Strips common inflectional suffixes to align morphological variations."""
+        suffixes = (
+            "ability", "ibility", "ations", "ation", "ities", "ity",
+            "ments", "ment", "ings", "ing", "ions", "ion", "ies", "es", "ed", "s",
+            "ic", "al", "a"
+        )
+        for sfx in suffixes:
+            if word.endswith(sfx) and len(word) - len(sfx) >= 3:
+                return word[:-len(sfx)]
+        return word
+
     def _embed_text(self, text: str) -> List[float]:
         vector = [0.0] * self.dimension
         if not text:
             return vector
 
-        tokens = text.lower().split()
-        for token in tokens:
-            # Deterministic bucket mapping
+        import re
+        norm_text = text.lower().replace("trade mark", "trademark").replace("trade marks", "trademark")
+        tokens = re.findall(r"[a-zA-Z0-9]+", norm_text)
+
+        token_counts = {}
+        for t in tokens:
+            if t not in self.STOPWORDS:
+                token_counts[t] = token_counts.get(t, 0) + 1
+
+        for token, count in token_counts.items():
+            tf_weight = 1.0 + math.log(count + 1)
+
+            # Full substantive token hash
             h = int(hashlib.sha256(token.encode("utf-8")).hexdigest(), 16)
             idx = h % self.dimension
-            weight = 1.0 + (h % 10) / 10.0
-            vector[idx] += weight
+            vector[idx] += 3.0 * tf_weight
+
+            # Morphological stem hash
+            stemmed = self._stem_token(token)
+            if stemmed != token:
+                h_stem = int(hashlib.sha256(stemmed.encode("utf-8")).hexdigest(), 16)
+                idx_stem = h_stem % self.dimension
+                vector[idx_stem] += 2.0 * tf_weight
+
+            # Compound decomposition (e.g. trademark -> trade, mark)
+            if "trademark" in token:
+                for sub in ("trade", "mark"):
+                    h_sub = int(hashlib.sha256(sub.encode("utf-8")).hexdigest(), 16)
+                    vector[h_sub % self.dimension] += 1.5 * tf_weight
 
         # L2 Normalize vector
         norm = math.sqrt(sum(x * x for x in vector))

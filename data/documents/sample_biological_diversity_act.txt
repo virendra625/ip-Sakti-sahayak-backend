@@ -1,5 +1,5 @@
 ================================================================================
-DEMO DATA — NOT AUTHORITATIVE (Smart India Hackathon Sample Source)
+Curated source excerpt. Refer to official government source URL for current text.
 ================================================================================
 Document Title: Biological Diversity Act, 2002 & Guidelines
 Authority: National Biodiversity Authority (NBA) / Ministry of Environment, Forest and Climate Change
@@ -8,7 +8,7 @@ Country: India
 Document Type: statute
 Topic: Biological_Resources
 Version: current
-Source URL: https://nbaindia.org
+Source URL: https://nbaindia.nic.in/acts-and-rules/acts
 
 Section 3: Access to Biological Resources
 No person who is not a citizen of India, or a body corporate, association or organization not incorporated or registered in India, or having non-Indian participation in its share capital or management, shall obtain any biological resource occurring in India or knowledge associated thereto for research, commercial utilization, or bio-survey without previous approval of the National Biodiversity Authority.

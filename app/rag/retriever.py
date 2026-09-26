@@ -65,7 +65,10 @@ class QdrantRetriever:
         if not chunks_metadata:
             return []
 
-        texts = [c["chunk_text"] for c in chunks_metadata]
+        texts = [
+            f"{c.get('document_title', '')} {c.get('heading', '') or ''} {c['chunk_text']}"
+            for c in chunks_metadata
+        ]
         embeddings = await self.embedding_provider.generate_batch_embeddings(texts)
 
         points = []

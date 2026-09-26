@@ -24,44 +24,56 @@ Built for the **Smart India Hackathon (SIH)**.
 
 ---
 
-## 2. System Architecture
+---
 
+## 2. System Architecture & End-to-End Information Flow
+
+The backend follows a strictly grounded, deterministic retrieval-augmented generation (RAG) pipeline to prevent hallucination of statutory provisions:
+
+### The Complete Flow
 ```
-User Query (English / Hindi) + Product Context
-                      │
-                      ▼
-            FastAPI Backend Gateway
-                      │
-        ┌─────────────┴─────────────┐
-        ▼                           ▼
-Product Classifier           Language & Jurisdiction
-(Rules + Decision Tree)      Preprocessing Engine
-        │                           │
-        └─────────────┬─────────────┘
-                      ▼
-             Targeted Retrieval Filter
-          (Jurisdiction = India, Topic)
-                      │
-                      ▼
-         Qdrant Hybrid Vector Search
-       (Payload: Section, Title, Page)
-                      │
-                      ▼
-              PostgreSQL / SQLite
-            (Authoritative Documents)
-                      │
-                      ▼
-          Grounded LLM Prompt Assembly
-            (Gemini / OpenAI / Mock)
-                      │
-                      ▼
-          Evidence & Citation Auditor
-        (Score: HIGH, MEDIUM, LOW, INSUFFICIENT)
-                      │
-                      ▼
-       Final Grounded Response + Citations
-           + Mandatory Legal Disclaimer
+Frontend (React / Vite)
+        │
+        ▼  [1. POST /api/v1/chat with query, language, jurisdiction, product context]
+FastAPI Backend Gateway (Input sanitization, session management, CORS)
+        │
+        ▼  [2. Query translation & domain term enrichment]
+RAG Service (TranslationService, normalize_jurisdiction, classification hook)
+        │
+        ▼  [3. Hybrid vector similarity query with strict jurisdiction & topic filters]
+Qdrant Vector Database (Vector embeddings + statutory payload metadata)
+        │
+        ▼  [4. Exact statute sections retrieved: Section 3(p), Section 2(1)(zb), etc.]
+Retrieved Government-Source Evidence (Curated statutory excerpts from official documents)
+        │
+        ▼  [5. Grounded prompt assembly with retrieved chunks]
+LLM Engine (Mock deterministic offline provider / Gemini 1.5 Flash / OpenAI GPT-4o-mini)
+        │
+        ▼  [6. Raw answer text with bracketed citations e.g. [Source 1]]
+URL Validation & Sanitization (URLService verifies official government domains)
+        │
+        ▼  [7. Claim-level verification: checks enclosing claim against source domain]
+Citation Auditor (CitationService & EvidenceService: ensures only supporting sources returned)
+        │
+        ▼  [8. Grounded answer + verified official URLs + confidence score + disclaimer]
+Final Answer Delivered to Frontend
 ```
+
+### Beginner's Guide: What Each Component Does in Simple Words
+
+- **Mock LLM vs. Gemini / OpenAI**:
+  - *Mock LLM Provider (Default)*: An intelligent, deterministic, zero-cost reasoning engine built into the backend. It reads retrieved statutory chunks and synthesizes question-specific legal guidance without needing any API key, internet connection, or external cloud. Perfect for offline hackathon demos, local development, and CI tests.
+  - *Gemini & OpenAI Providers (Production)*: When you provide an API key in `.env` (`LLM_PROVIDER=gemini` or `openai`), the backend switches to state-of-the-art foundation models. Even then, the models are constrained by strict system prompts to answer *only* using the retrieved government evidence.
+- **Qdrant Vector Database**:
+  - Acts as a semantic search engine. Unlike simple keyword search that looks for exact words, Qdrant understands mathematical meaning. If a user asks *"How do I protect my brand name?"*, Qdrant matches it with statutory chunks from the *Trade Marks Act, 1999* even if the user never typed the word "trademark". It also enforces strict filters so Indian laws are never mixed with foreign jurisdictions.
+- **RAG (Retrieval-Augmented Generation)**:
+  - Standard AI models often "hallucinate" (invent fake laws, incorrect sections, or non-existent court rulings). RAG stops this by forcing the AI into an "open-book exam": first, the system retrieves the exact authentic legal text from government statutes; then, the AI reads those retrieved chunks and answers the user's question based strictly on that evidence.
+- **Citations & Claim-Level Validation**:
+  - Every legal claim made in the answer is tagged with a citation bracket like `[Source 1]`. Our `CitationService` inspects the text surrounding each bracket to verify that the specific claim matches the topic of the cited source (for example, a trademark sentence cannot cite the Patents Act). Chunks that were retrieved but not actually used to support any statement are discarded from the final response.
+- **Official URL Validation (`URLService`)**:
+  - Ensures every source link presented to the user belongs to an authentic, active government portal (IPO, CGPDTM, NBA, FSSAI, CDSCO). Any hallucinated, unverified, or broken URLs are automatically stripped before reaching the user.
+- **Why This Is Legal Informational Guidance and Not Legal Advice**:
+  - Statutory classification and patentability depend on subjective legal analysis and official examination by government bodies (such as the Indian Patent Office, National Biodiversity Authority, or AYUSH State Licensing Authorities). IP-SAKTI Sahayak provides preliminary decision-support to help innovators prepare compliant applications, but does not replace licensed legal practitioners.
 
 ---
 
@@ -378,21 +390,35 @@ curl -X POST "http://127.0.0.1:8000/api/v1/feedback" \
 
 ---
 
-## 10. Running the Test Suite
+## 10. Verification, Audit & Test Suite
 
-Execute the automated test suite with pytest:
+### 1. Statutory Source URL Live Audit
+Audit the 5 canonical Indian statutory URLs (Patents Act, Trade Marks Act, Biological Diversity Act, Ayurveda Aahar Regulations, Drugs & Cosmetics Act) with zero external dependencies:
 ```bash
-python -m pytest -v
+python scripts/check_source_urls.py
 ```
-All **19 tests** will verify:
-- System health and database synchronization
-- Classical ASU vs. Proprietary vs. Ayurveda Aahar classification
-- Insufficient information detection and clarifying question triggers
-- Standalone retrieval search with jurisdictional isolation
-- Citation formatting and evidence confidence scoring
-- Anti-hallucination guard when given questions without source evidence
-- Multilingual Hindi and English conversational processing
-- Feedback logging and document ingestion
+Expected output: All 5 statutory endpoints verified with HTTP 200.
+
+### 2. SIH Acceptance Audit Test Suite (16 Points)
+Run the dedicated audit test suite covering all compliance requirements (official URLs, unverified URL rejection, notice header verification, no hardcoded routing flags, claim-level citation validation, conditional language, multilingual queries, insufficient evidence admission, and the 4 domain functional questions):
+```bash
+pytest -v tests/test_audit_requirements.py
+```
+
+### 3. Full Automated Test Suite (43 Tests)
+Execute all test modules:
+```bash
+pytest -v
+```
+All **43 tests** across 8 test suites will verify:
+- Complete 16-point SIH Audit Requirements (`test_audit_requirements.py`)
+- Grounded conversational responses and product context (`test_chat.py`)
+- Claim-level citation mapping and anti-hallucination guardrails (`test_citations.py`)
+- Classical ASU vs. Proprietary vs. Ayurveda Aahar classification with conditional legal language (`test_classification.py`)
+- Document ingestion and chunk retrieval (`test_documents.py`)
+- API health and database connectivity (`test_health.py`)
+- Strict jurisdictional isolation and missing jurisdiction prompts (`test_jurisdiction.py`)
+- Hybrid semantic retrieval and filtering (`test_rag.py`)
 
 ---
 

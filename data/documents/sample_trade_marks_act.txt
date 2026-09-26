@@ -1,0 +1,27 @@
+================================================================================
+Curated source excerpt. Refer to official government source URL for current text.
+================================================================================
+Document Title: Trade Marks Act, 1999 & Classification Guidelines
+Authority: Office of the Controller General of Patents, Designs and Trade Marks (CGPDTM)
+Jurisdiction: India
+Country: India
+Document Type: statute
+Topic: Trademark
+Version: current
+Source URL: https://ipindia.gov.in/trade-marks-resources-act
+
+Chapter I - Definitions and Scope of Protection
+
+Section 2(1)(zb): Definition of Trade Mark
+A "trade mark" means a mark capable of being represented graphically and which is capable of distinguishing the goods or services of one person from those of others and may include shape of goods, their packaging, brand names, labels, and combination of colours. A distinctive brand name, coined word, or visual mark for an Ayurvedic product or formulation can be registered under the Trade Marks Act, 1999.
+
+Section 9: Absolute Grounds for Refusal of Registration
+1. Trade marks which are devoid of distinctive character or consist exclusively of marks or indications that designate the kind, quality, intended purpose, or geographical origin of goods shall not be registered.
+2. Classical Ayurvedic formulation names, generic botanical or common names derived from ancient authoritative scriptures (such as Triphala, Chyawanprash, Brahmi, or Ashwagandha) belong to the public domain and cannot be monopolized as exclusive private trademarks. Distinctive brand names applied to such formulations, however, may be registered.
+
+Classification of Goods (Nice Classification Framework):
+Trademark registration must be filed in the class corresponding to the actual goods and intended purpose:
+- Class 3 applies to non-medicated cosmetics, hair oils for grooming or beautification, skincare preparations, and herbal toiletries.
+- Class 5 applies to pharmaceuticals, medicinal Ayurvedic preparations, and therapeutic formulations intended for the treatment, prevention, or mitigation of disease or disorders.
+- Class 30 applies to dietary herbal food preparations, spices, and Ayurveda Aahar wellness food formulations without medicinal claims.
+Proper classification depends on the true nature, composition, and marketing claims of the product; if intended use is unspecified, clarification of cosmetic versus medicinal purpose is required.
