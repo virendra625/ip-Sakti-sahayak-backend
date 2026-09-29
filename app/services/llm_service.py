@@ -407,6 +407,12 @@ class GeminiLLMProvider(BaseLLMProvider):
 
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(self.endpoint, json=payload)
+            if resp.status_code != 200:
+                print("========== GEMINI API ERROR ==========")
+                print("STATUS:", resp.status_code)
+                print("RESPONSE:", resp.text)
+                print("MODEL:", self.model)
+                print("======================================")
             resp.raise_for_status()
             data = resp.json()
             candidates = data.get("candidates", [])
